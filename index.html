@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Compra</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .formulario {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: #f9f9f9;
+            box-sizing: border-box;
+        }
+        .formulario input[type="submit"] {
+            background-color: #25D366; /* Color de WhatsApp */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .formulario label, .formulario p {
+            margin: 10px 0;
+        }
+        @media (max-width: 600px) {
+            .formulario {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+    </style>
+    <script>
+        function actualizarPrecio() {
+            const precioPorUnidad = 10;
+            const cantidad = document.getElementById('cantidad').value;
+            const precioTotal = precioPorUnidad * cantidad;
+            document.getElementById('precio-total').textContent = `Precio Total: $${precioTotal.toFixed(2)}`;
+            document.getElementById('mensaje-whatsapp').value = `Hola, me gustar�a comprar ${cantidad} la prueba por un total de $${precioTotal.toFixed(2)}`;
+        }
+    </script>
+</head>
+<body>
+    <div class="formulario">
+        <h2>Compra de Producto</h2>
+        <form action="https://api.whatsapp.com/send" method="get" target="_blank">
+            <p>Producto: Prueba</p>
+            <p>Precio por Unidad: 10</p>
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad" value="1" min="1" oninput="actualizarPrecio()" required>
+            <p id="precio-total">Precio Total: $10</p>
+            <input type="hidden" id="mensaje-whatsapp" name="text" value="Hola, me gustar�a comprar 1 Prueba por un total de $10">
+            <input type="hidden" name="phone" value="+5352049116">
+            <input type="submit" value="Comprar">
+        </form>
+    </div>
+</body>
+</html>
