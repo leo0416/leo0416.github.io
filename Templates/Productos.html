@@ -1,0 +1,161 @@
+<!DOCTYPE html><html data-bs-theme="light" lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no"><title>Sign up - Brand</title><link rel="stylesheet" href="../assets/bootstrap/css/bootstrap.min.css?h=91180125d193e45e653b99b7314045c4"></head><body><nav class="navbar navbar-expand-md fixed-top bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img class="rounded-circle" src="../assets/img/CajaPlus.jpg?h=1e01f294ddd6e9ee35166c8f308df233" width="60" height="60" alt="CajaPlus" />
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Cambié el ID para que coincida con el data-bs-target -->
+    <div id="navbarContent" class="collapse navbar-collapse">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="Panel_Principal.html">Inicio</a>
+        </li>
+      </ul>
+      <!-- Botón de salir dentro del collapse para que también se oculte/muestre -->
+      <a class="btn btn-primary shadow" role="button" href="../index.html">Salir</a>
+    </div>
+  </div>
+</nav><nav class="navbar navbar-expand-lg bg-info navbar-dark"><div class="container-fluid"><span class="navbar-brand">CajaPlus - Productos</span><button class="btn btn-outline-light btn-sm">Cerrar sesión</button></div></nav><div class="container my-5"><h2 class="text-center mb-4">Gestión de Productos</h2><div class="row text-center mb-5"><div class="col-md-4 mb-3"><a class="btn btn-outline-primary w-100 py-3" role="button" href="Ventas.html">💰 Registrar Venta</a></div><div class="col-md-4 mb-3"><a class="btn btn-outline-success w-100 py-3" role="button" href="Productos.html">📦 Productos</a></div><div class="col-md-4 mb-3"><a class="btn btn-outline-warning w-100 py-3" role="button" href="Reportes.html">📊 Reportes</a></div><div class="card mb-4">
+      <div class="card-body">
+        <h5 id="formTitle">Agregar Producto</h5>
+        <form id="productoForm">
+          <input type="hidden" id="editIndex">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <input type="text" class="form-control" id="nombre" placeholder="Nombre" required="">
+            </div>
+            <div class="col-md-2">
+              <input type="number" class="form-control" id="precio" placeholder="Precio ($)" step="0.01" required="">
+            </div>
+            <div class="col-md-2">
+              <input type="number" class="form-control" id="stock" placeholder="Stock" required="">
+            </div>
+            <div class="col-md-3">
+              <input type="text" class="form-control" id="categoria" placeholder="Categoría" required="">
+            </div>
+            <div class="col-md-2 d-grid">
+              <button type="submit" class="btn btn-success">Guardar</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div><div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Nombre</th>
+            <th>Precio ($)</th>
+            <th>Stock</th>
+            <th>Categoría</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tablaProductos"></tbody>
+      </table>
+    </div></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script><script>
+    let productos = JSON.parse(localStorage.getItem('productos')) || [];
+
+    function verificarSesion() {
+      if (localStorage.getItem('loggedIn') !== 'true') {
+        window.location.href = '../index.html';
+      }
+      renderizarTabla();
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem('loggedIn');
+      window.location.href = '../index.html';
+    }
+
+    function renderizarTabla() {
+      const tbody = document.getElementById('tablaProductos');
+      tbody.innerHTML = '';
+      productos.forEach((prod, index) => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${prod.nombre}</td>
+          <td>$ ${parseFloat(prod.precio).toFixed(2)}</td>
+          <td>${prod.stock}</td>
+          <td>${prod.categoria}</td>
+          <td>
+            <button class="btn btn-sm btn-warning me-2" onclick="editarProducto(${index})">Editar</button>
+            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${index})">Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+
+    document.getElementById('productoForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value.trim();
+      const precio = parseFloat(document.getElementById('precio').value);
+      const stock = parseInt(document.getElementById('stock').value);
+      const categoria = document.getElementById('categoria').value.trim();
+      const editIndex = document.getElementById('editIndex').value;
+
+      const nuevoProducto = { nombre, precio, stock, categoria };
+
+      if (editIndex === '') {
+        productos.push(nuevoProducto);
+      } else {
+        productos[editIndex] = nuevoProducto;
+        document.getElementById('formTitle').textContent = 'Agregar Producto';
+      }
+
+      localStorage.setItem('productos', JSON.stringify(productos));
+      this.reset();
+      document.getElementById('editIndex').value = '';
+      renderizarTabla();
+    });
+
+    function editarProducto(index) {
+      const prod = productos[index];
+      document.getElementById('nombre').value = prod.nombre;
+      document.getElementById('precio').value = prod.precio;
+      document.getElementById('stock').value = prod.stock;
+      document.getElementById('categoria').value = prod.categoria;
+      document.getElementById('editIndex').value = index;
+      document.getElementById('formTitle').textContent = 'Editar Producto';
+    }
+
+    function eliminarProducto(index) {
+      if (confirm('¿Estás seguro de eliminar este producto?')) {
+        productos.splice(index, 1);
+        localStorage.setItem('productos', JSON.stringify(productos));
+        renderizarTabla();
+      }
+    }
+  </script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggler = document.querySelector(".navbar-toggler");
+    const collapse = document.querySelector("#navbarContent");
+
+    // Cerrar el menú si se hace clic fuera de él
+    document.addEventListener("click", function (event) {
+      const isClickInside = collapse.contains(event.target) || toggler.contains(event.target);
+      if (!isClickInside && collapse.classList.contains("show")) {
+        new bootstrap.Collapse(collapse).hide();
+      }
+    });
+
+    // Alternar el menú manualmente al hacer clic en el botón hamburguesa
+    toggler.addEventListener("click", function (event) {
+      event.stopPropagation(); // Evita que el clic se propague al documento
+      const bsCollapse = new bootstrap.Collapse(collapse, {
+        toggle: false
+      });
+
+      if (collapse.classList.contains("show")) {
+        bsCollapse.hide();
+      } else {
+        bsCollapse.show();
+      }
+    });
+  });
+</script></div><script src="../assets/bootstrap/js/bootstrap.min.js?h=374d178d651fa0eaf680a1fa7b40c788"></script><script src="../assets/js/script.min.js?h=4b1f99f2e8ff6ac8a7c04891f6b7129c"></script></body></html>
